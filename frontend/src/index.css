@@ -1,0 +1,379 @@
+/* ================================
+   Smart Study Buddy — Full CSS
+   Cross-browser, glassy dark UI
+   ================================ */
+
+/* ---------- Color system ---------- */
+:root {
+  --bg-0: #0b1220;         /* page background */
+  --bg-1: #0f172a;         /* card background */
+  --bg-2: #111827;         /* chat inner bg */
+  --glass: rgba(20, 25, 38, 0.6);
+  --glass-strong: rgba(20, 25, 38, 0.75);
+
+  --text-0: #e5e7eb;       /* primary text */
+  --text-1: #c7cbd6;       /* secondary text */
+  --muted: #9aa3b2;
+
+  --brand-1: #60a5fa;      /* blue */
+  --brand-2: #a78bfa;      /* purple */
+  --brand-3: #7dd3fc;      /* cyan */
+
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+
+  --ring: #334155;         /* focus ring */
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+
+  --shadow-1: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 10px 50px rgba(0, 0, 0, 0.45);
+
+  --blur-weak: blur(4px);
+  --blur-strong: blur(8px);
+
+  --trans-1: 0.2s ease;
+  --trans-2: 0.25s ease;
+
+  --max-w: 1120px;         /* page max width */
+}
+
+/* ---------- Global resets ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  background: radial-gradient(1200px 800px at 80% -10%, #1d2440 0%, transparent 60%),
+              radial-gradient(1000px 700px at -10% 0%, #17203a 0%, transparent 55%),
+              var(--bg-0);
+  color: var(--text-0);
+  font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter,
+        Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth scrolling inside the chat area */
+:root {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(96, 165, 250, 0.25);
+}
+
+/* ---------- Layout ---------- */
+.container {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding: 48px 20px 28px;
+}
+
+/* ---------- Badge / logo ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--blur-weak);
+  backdrop-filter: var(--blur-weak);
+  color: var(--text-1);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: var(--shadow-1);
+}
+
+/* ---------- Heading with gradient word ---------- */
+.h {
+  margin: 24px 0 6px;
+  font-size: clamp(30px, 4.8vw, 54px);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  line-height: 1.15;
+}
+
+.h .grad {
+  background: linear-gradient(90deg, var(--brand-1), var(--brand-2));
+  background-clip: text;
+  -webkit-background-clip: text;          /* Safari */
+  -webkit-text-fill-color: transparent;    /* Safari */
+}
+
+.sub {
+  color: var(--text-1);
+  margin-bottom: 22px;
+}
+
+/* ---------- Chat card ---------- */
+.chat-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--blur-strong);  /* Safari */
+  backdrop-filter: var(--blur-strong);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+
+/* messages scroll zone */
+.chat-scroll {
+  height: min(64vh, 520px);
+  overflow-y: auto;
+  padding: 16px 18px 18px;
+  overscroll-behavior: contain; /* browsers that support it */
+}
+
+/* Nice thin scrollbar */
+.chat-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------- Messages ---------- */
+
+/* row container so we can reverse for the user */
+.msg-row {
+  display: flex;
+  margin: 10px 0;
+}
+
+/* left (AI) vs right (user) placement */
+.msg--ai {
+  justify-content: flex-start;
+}
+.msg--user {
+  justify-content: flex-end;
+}
+
+/* message bubble */
+.bubble {
+  max-width: min(78%, 780px);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  line-height: 1.58;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  color: var(--text-0);
+  background: rgba(31, 41, 55, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  transition: background var(--trans-2), transform var(--trans-1), box-shadow var(--trans-1);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+}
+
+/* AI bubble (left) */
+.msg--ai .bubble {
+  background: rgba(31, 41, 55, 0.92);
+}
+
+/* User bubble (right) with subtle accent */
+.msg--user .bubble {
+  background: linear-gradient(180deg, rgba(54, 65, 89, 0.95), rgba(40, 50, 73, 0.95));
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: 0 10px 22px rgba(45, 55, 72, 0.35);
+}
+
+/* hover polish */
+.bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.35);
+}
+
+/* optional message meta */
+.meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ---------- Composer row ---------- */
+.composer {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  background: linear-gradient(180deg, rgba(11, 18, 32, 0.25), rgba(11, 18, 32, 0.75));
+  -webkit-backdrop-filter: var(--blur-weak);
+  backdrop-filter: var(--blur-weak);
+}
+
+/* input */
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: var(--text-0);
+  background: rgba(17, 24, 39, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  outline: none;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: border var(--trans-1), box-shadow var(--trans-1), background var(--trans-1);
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.input:focus {
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.12);
+}
+
+/* send button */
+.send {
+  padding: 0 18px;
+  min-width: 64px;
+  border: 0;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(180deg, #5b7cfa, #4c6bf0);
+  transition: transform var(--trans-1), box-shadow var(--trans-1), background var(--trans-2);
+  box-shadow: 0 10px 18px rgba(76, 107, 240, 0.25);
+}
+
+.send:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(76, 107, 240, 0.34);
+  background: linear-gradient(180deg, #6785ff, #5574fb);
+}
+
+.send:active {
+  transform: translateY(0);
+}
+
+/* ---------- Footer note ---------- */
+.footer {
+  margin: 12px 0 0;
+  color: var(--muted);
+  text-align: center;
+}
+.footer strong {
+  color: var(--text-0);
+}
+
+/* ---------- Small helper UI ---------- */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(17, 24, 39, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  color: var(--text-0);
+  cursor: pointer;
+  transition: background var(--trans-2), transform var(--trans-1), box-shadow var(--trans-1);
+}
+
+.copy-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+}
+
+/* ---------- Utility: visually hidden ---------- */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 720px) {
+  .container {
+    padding: 28px 14px 18px;
+  }
+  .chat-scroll {
+    height: min(58vh, 440px);
+  }
+  .bubble {
+    max-width: 88%;
+    font-size: 14.5px;
+  }
+  .composer {
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+  .send {
+    min-width: 58px;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =======================================================
+   HEADING PATCH — make “AI tutor” gradient match the
+   version you liked; supports both .h .grad and .title .ai
+   ======================================================= */
+
+/* If your markup is: <h1 class="h">Your step-by-step <span class="grad">AI tutor</span>.</h1> */
+.h .grad {
+  background: linear-gradient(90deg, #ffffff 0%, #b8c7ff 60%, #7ce0d3 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  text-shadow:
+    0 1px 0 rgba(11, 18, 32, 0.35),
+    0 12px 30px rgba(124, 224, 211, 0.14);
+}
+
+/* If your markup is: <h1 class="title">Your step-by-step <span class="ai">AI tutor</span>.</h1> */
+.title {
+  margin: 8px 0 6px;
+  font-weight: 800;
+  line-height: 1.05;
+  font-size: clamp(28px, 4.7vw, 48px);
+}
+.title .ai {
+  background: linear-gradient(90deg, #ffffff 0%, #b8c7ff 60%, #7ce0d3 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  text-shadow:
+    0 1px 0 rgba(11, 18, 32, 0.35),
+    0 12px 30px rgba(124, 224, 211, 0.14);
+}
+
+
+
+
+
+

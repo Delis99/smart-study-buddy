@@ -21,5 +21,3 @@ Smart Study Buddy is an **AI-powered bilingual tutor** built for the **AWS AI Ag
 - Submission: [AWS AI Agent Global Hackathon 2025](https://devpost.com)  
 - Deadline: **October 20, 2025, 5PM PT**  
 - Team: Solo project by Elias (Elias0511)  
-
-## 📂 Project Structure

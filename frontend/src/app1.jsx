@@ -9,18 +9,13 @@ function App() {
     {
       id: 1,
       role: 'assistant',
-      content: "Hi! I'm your AI tutor. Ask me anything and I'll explain it step-by-step with reliable sources.\n\n¡Hola! Soy tu tutor de IA. Pregúntame lo que quieras y te lo explicaré paso a paso con fuentes confiables.\n\n🌍 I automatically respond in your language!\n📸 You can also upload images/screenshots!",
+      content: "Hi! I'm your step-by-step AI tutor. Ask anything and I'll explain it clearly.\n\n¡Hola! Soy tu tutor de IA paso a paso. Pregunta lo que quieras y te lo explicaré claramente.\n\n🌍 I automatically respond in your language! / ¡Respondo automáticamente en tu idioma!",
       timestamp: new Date().toISOString()
     }
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedImage, setSelectedImage] = useState(null)
-  const [imagePreview, setImagePreview] = useState(null)
-  const [showUploadMenu, setShowUploadMenu] = useState(false)
   const messagesEndRef = useRef(null)
-  const fileInputRef = useRef(null)
-  const uploadMenuRef = useRef(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -30,76 +25,34 @@ function App() {
     scrollToBottom()
   }, [messages])
 
-  const handleImageSelect = (e) => {
-    const file = e.target.files[0]
-    if (file && file.type.startsWith('image/')) {
-      setSelectedImage(file)
-      
-      // Create preview
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const removeImage = () => {
-    setSelectedImage(null)
-    setImagePreview(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
-
   const sendMessage = async (e) => {
     e.preventDefault()
     
-    if ((!input.trim() && !selectedImage) || isLoading) return
+    if (!input.trim() || isLoading) return
 
     const userMessage = {
       id: Date.now(),
       role: 'user',
-      content: input.trim() || "What's in this image?",
-      image: imagePreview,
+      content: input.trim(),
       timestamp: new Date().toISOString()
     }
 
     setMessages(prev => [...prev, userMessage])
-    const currentInput = input.trim()
-    const currentImage = selectedImage
-    const currentImagePreview = imagePreview
-    
     setInput('')
-    setSelectedImage(null)
-    setImagePreview(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
     setIsLoading(true)
 
     try {
       console.log('🚀 Sending request to:', LAMBDA_URL)
-      console.log('📝 Query:', currentInput)
-      console.log('🖼️ Has image:', !!currentImage)
-
-      // Prepare request body
-      const requestBody = {
-        prompt: currentInput || "Please analyze this image and explain what you see in detail."
-      }
-
-      // Add image if present (convert to base64 without data URL prefix)
-      if (currentImagePreview) {
-        const base64Data = currentImagePreview.split(',')[1]
-        requestBody.image = base64Data
-      }
+      console.log('📝 Query:', input.trim())
 
       const response = await fetch(LAMBDA_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({
+          prompt: input.trim()  // Lambda expects 'prompt'
+        })
       })
 
       console.log('📥 Response status:', response.status)
@@ -175,7 +128,7 @@ function App() {
                   <span></span>
                   <span></span>
                 </div>
-                <p className="loading-text">Analyzing and searching...</p>
+                <p className="loading-text">Searching and analyzing...</p>
               </div>
             </div>
           )}
@@ -185,43 +138,21 @@ function App() {
 
         {/* Input Form */}
         <form onSubmit={sendMessage} className="input-form">
-          {/* Image Preview */}
-          {imagePreview && (
-            <div className="image-preview-container">
-              <img src={imagePreview} alt="Preview" className="image-preview" />
-              <button type="button" onClick={removeImage} className="remove-image-btn">
-                ✕
-              </button>
-            </div>
-          )}
-          
           <div className="input-wrapper">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageSelect}
-              accept="image/*"
-              style={{ display: 'none' }}
-            />
-            <button 
-              type="button" 
-              className="attach-btn"
-              onClick={() => fileInputRef.current?.click()}
-              title="Upload image"
-            >
-              📎
+            <button type="button" className="attach-btn" title="Coming soon">
+              <span>+</span>
             </button>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={selectedImage ? "Describe what you want to know about the image..." : "Type your message..."}
+              placeholder="Type your message..."
               disabled={isLoading}
               className="message-input"
             />
             <button 
               type="submit" 
-              disabled={isLoading || (!input.trim() && !selectedImage)}
+              disabled={isLoading || !input.trim()}
               className="send-btn"
             >
               Ask
@@ -240,7 +171,7 @@ function App() {
 
 // Message Bubble Component
 function MessageBubble({ message }) {
-  const { role, content, sources, metadata, language, image } = message
+  const { role, content, sources, metadata, language } = message
 
   return (
     <div className={`message ${role}-message`}>
@@ -248,10 +179,10 @@ function MessageBubble({ message }) {
         {role === 'user' ? '👤' : role === 'error' ? '⚠️' : '🤖'}
       </div>
       <div className="message-content">
-        {/* Show uploaded image if present */}
-        {image && role === 'user' && (
-          <div className="message-image">
-            <img src={image} alt="Uploaded" />
+        {/* Language indicator for assistant messages */}
+        {role === 'assistant' && language && (
+          <div className="language-badge">
+            {language === 'es' ? '🇪🇸 Español' : '🇬🇧 English'}
           </div>
         )}
         
@@ -289,8 +220,4 @@ function MessageBubble({ message }) {
 }
 
 export default App
-
-
-
-
 
